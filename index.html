@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BenBlends — ALSE: Advanced Live Studio Environment</title>
+  <meta name="description" content="BenBlends builds ALSE — a deterministic execution harness for AI-assisted music creation. Not a chatbot bolted onto a DAW. Architecture.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --bg-card: #121214;
+      --bg-elevated: #18181b;
+      --border: #27272a;
+      --text: #f4f4f5;
+      --text-dim: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #22d3ee;
+      --accent-dim: #0891b2;
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* Grid background */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Nav */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 80px;
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--text);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all 0.2s;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0a0b;
+    }
+
+    .btn-primary:hover {
+      background: #67e8f9;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--text-dim);
+    }
+
+    /* Hero */
+    .hero {
+      padding: 60px 0 100px;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .hero-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      letter-spacing: -1px;
+    }
+
+    .hero h1 .highlight {
+      background: linear-gradient(135deg, var(--accent), #06b6d4, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--text-dim);
+      max-width: 640px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Architecture diagram area */
+    .arch-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.5px;
+    }
+
+    .section-sub {
+      color: var(--text-dim);
+      max-width: 600px;
+      margin-bottom: 48px;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    /* Architecture grid */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 20px;
+    }
+
+    .arch-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      transition: border-color 0.2s;
+    }
+
+    .arch-card:hover {
+      border-color: #3f3f46;
+    }
+
+    .arch-card .icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-size: 1.25rem;
+    }
+
+    .arch-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .arch-card p {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* Stats / locks */
+    .locks-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .locks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .lock-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .lock-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+    }
+
+    .lock-card:nth-child(1)::before { background: var(--accent); }
+    .lock-card:nth-child(2)::before { background: var(--amber); }
+    .lock-card:nth-child(3)::before { background: var(--red); }
+
+    .lock-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .lock-card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .lock-card p {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* Stats bar */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 24px;
+      padding: 60px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-dim);
+    }
+
+    /* Timeline / story */
+    .story-section {
+      padding: 80px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .story-block {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .story-text h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .story-text p {
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      line-height: 1.7;
+    }
+
+    .story-text code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      background: var(--bg-elevated);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--accent);
+    }
+
+    .story-quote {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      font-style: italic;
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    .story-quote .attribution {
+      margin-top: 12px;
+      font-style: normal;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    /* CTA */
+    .cta-section {
+      padding: 80px 0 120px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .cta-section h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .cta-section p {
+      color: var(--text-dim);
+      max-width: 500px;
+      margin: 0 auto 32px;
+    }
+
+    /* Contact form */
+    .contact-form {
+      max-width: 480px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .contact-form input,
+    .contact-form textarea {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.875rem;
+      transition: border-color 0.2s;
+    }
+
+    .contact-form input:focus,
+    .contact-form textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .contact-form textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .contact-form button {
+      padding: 14px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: #0a0a0b;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+
+    .contact-form button:hover {
+      background: #67e8f9;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    footer .logo {
+      font-size: 1rem;
+    }
+
+    footer .links {
+      display: flex;
+      gap: 24px;
+    }
+
+    footer .links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+
+    footer .links a:hover {
+      color: var(--text-dim);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      nav { flex-direction: column; gap: 16px; }
+      .nav-links { flex-wrap: wrap; justify-content: center; }
+      .story-block { grid-template-columns: 1fr; }
+      .hero h1 { font-size: 2rem; }
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Nav -->
+    <nav>
+      <div class="logo">ben<span>blends</span></div>
+      <div class="nav-links">
+        <a href="#architecture">Architecture</a>
+        <a href="#locks">Infrastructure</a>
+        <a href="#story">The Story</a>
+        <a href="https://github.com/benblends" target="_blank">GitHub</a>
+        <a href="#contact" class="btn btn-primary">Get in Touch</a>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-badge">
+        <span class="dot"></span>
+        ALSE 5.0 — Deterministic AI for DAWs
+      </div>
+      <h1>
+        The AI infrastructure layer<br>
+        for <span class="highlight">music creation tools</span>
+      </h1>
+      <p>
+        A deterministic execution harness for AI-assisted recording. Not a chatbot
+        bolted onto a DAW. An 8-tier architecture that sits between the user, the
+        LLM, and the studio — solving hallucination, state sync, and the
+        psychological safety net problem.
+      </p>
+      <div class="hero-actions">
+        <a href="#architecture" class="btn btn-outline">The Architecture</a>
+        <a href="#contact" class="btn btn-primary">Contact Us</a>
+      </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div>
+        <div class="stat-value">18</div>
+        <div class="stat-label">Months of development</div>
+      </div>
+      <div>
+        <div class="stat-value">1,250+</div>
+        <div class="stat-label">Passing tests</div>
+      </div>
+      <div>
+        <div class="stat-value">3</div>
+        <div class="stat-label">Infrastructure locks</div>
+      </div>
+      <div>
+        <div class="stat-value">4</div>
+        <div class="stat-label">Persona architecture</div>
+      </div>
+    </div>
+
+    <!-- Architecture -->
+    <section class="arch-section" id="architecture">
+      <div class="section-label">Architecture</div>
+      <h2 class="section-title">Not a feature. A platform.</h2>
+      <p class="section-sub">
+        ALSE is built on four systems that together solve the fundamental problem
+        of integrating non-deterministic AI with deterministic DAW state management.
+      </p>
+
+      <div class="arch-grid">
+        <div class="arch-card">
+          <div class="icon" style="background: rgba(34,211,238,0.1);">🎙️</div>
+          <h3>Session Context Model</h3>
+          <p>
+            A structured, SQLite-backed representation tracking song title, production
+            stage, take count, last action, user skill level, and session history.
+            Updated by every action. Read before every response.
+          </p>
+        </div>
+
+        <div class="arch-card">
+          <div class="icon" style="background: rgba(74,222,128,0.1);">🛡️</div>
+          <h3>Execution Harness</h3>
+          <p>
+            Pre-flight snapshot capture, atomic execution, validation, and rollback
+            on failure. Wraps every DAW mutation in a deterministic safety layer.
+            Preserves every take — even failed ones.
+          </p>
+        </div>
+
+        <div class="arch-card">
+          <div class="icon" style="background: rgba(251,191,36,0.1);">🔀</div>
+          <h3>Three-Persona Routing</h3>
+          <p>
+            Reese (Concierge), James (Producer), Ray (Engineer). Each persona has
+            a constrained tool surface that cannot overlap. Creative feedback,
+            technical execution, and system health are isolated by design.
+          </p>
+        </div>
+
+        <div class="arch-card">
+          <div class="icon" style="background: rgba(139,92,246,0.1);">⚡</div>
+          <h3>Hybrid Intent Classifier</h3>
+          <p>
+            Four-level waterfall: state override → fast-path regex (100ms) → brain
+            router → AI fallback. The 100ms mechanical layer handles critical
+            commands without LLM latency. Non-deterministic paths are sandboxed.
+          </p>
+        </div>
+
+        <div class="arch-card">
+          <div class="icon" style="background: rgba(248,113,113,0.1);">📡</div>
+          <h3>Real-Time State Push</h3>
+          <p>
+            WebSocket EventBus replacing HTTP polling for sub-100ms UI sync.
+            Voice and Companion App converge on the same state model. No stale
+            state, no race conditions between modalities.
+          </p>
+        </div>
+
+        <div class="arch-card">
+          <div class="icon" style="background: rgba(52,211,153,0.1);">🧠</div>
+          <h3>User Model</h3>
+          <p>
+            Cross-session learning that adapts behavior: same question gets a
+            different answer on session 1 (pedagogical) vs. session 50 (direct).
+            Grows with the user from first-time recorder to experienced producer.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Infrastructure Locks -->
+    <section class="locks-section" id="locks">
+      <div class="section-label">Infrastructure</div>
+      <h2 class="section-title">Three infrastructure locks for safe AI execution</h2>
+      <p class="section-sub">
+        Every major audio company is currently hitting the same wall: LLMs are
+        non-deterministic, but DAWs require deterministic state. These three locks
+        close the gap that every chatbot-on-DAW wrapper ignores.
+      </p>
+
+      <div class="locks-grid">
+        <div class="lock-card">
+          <div class="lock-number">Lock 01</div>
+          <h3>Harness Transaction IDs</h3>
+          <p>
+            Every multi-step command generates a <code style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent);">harness_transaction_id</code>
+            (UUIDv4) in preflight. Every event emitted during execution carries it.
+            Subscribers can query <code style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent);">was_rolled_back()</code>
+            before committing state. No more orphaned events or ghost states.
+          </p>
+        </div>
+
+        <div class="lock-card">
+          <div class="lock-number">Lock 02</div>
+          <h3>Event Compensation</h3>
+          <p>
+            When the harness rolls back, subscribers who already consumed forward
+            events receive inverse compensation events with the same
+            <code style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;color:var(--accent);">correlation_id</code>.
+            The Session Context Model and User Observation Service revert cleanly.
+            All-or-nothing — silent partial rollback is not an option.
+          </p>
+        </div>
+
+        <div class="lock-card">
+          <div class="lock-number">Lock 03</div>
+          <h3>Severity-Graded Failures</h3>
+          <p>
+            Three failure grades: <strong style="color:var(--accent);">transient</strong>
+            (earcon only, the system recovers silently),
+            <strong style="color:var(--amber);">permanent</strong> (TTS explanation,
+            actionable next steps), and <strong style="color:var(--red);">catastrophic</strong>
+            (TTS + SESSION_LOCKED state + Companion overlay). The user always knows
+            what happened and what to do next.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- The Story -->
+    <section class="story-section" id="story">
+      <div class="section-label">The North Star</div>
+      <h2 class="section-title">"Blue Moon" — the scenario that drives every decision</h2>
+      <p class="section-sub">
+        A 17-year-old unboxes ALSE. They have a song called "Blue Moon" about a
+        breakup. They have never used a DAW. They do not know what a bus is, what
+        gain staging means, or how to ask for what they want. The system must
+        bridge that gap — from first command to finished recording.
+      </p>
+
+      <div class="story-block">
+        <div class="story-text">
+          <h3>The concierge who doesn't execute commands</h3>
+          <p>
+            Reese is the front door. She does not mute tracks, arm inputs, or
+            touch transport. Her tool surface is constrained to conversation,
+            intent routing, and failure explanation. When a command comes in, she
+            classifies it and delegates — technical command goes to Ray (the
+            engineer who never speaks), creative question goes to James (the
+            producer who never touches the DAW).
+          </p>
+          <p>
+            This separation is what makes the system deterministic. If Ray's
+            process crashes, James and Reese continue independently. The studio
+            does not go down because one persona failed.
+          </p>
+        </div>
+
+        <div class="story-quote">
+          "I kept the take. It's sitting there labeled 'Blue Moon Take 1.'
+          It's not going anywhere. You might want it later — sometimes the messy
+          take has the feel, even if the notes aren't perfect."
+          <div class="attribution">— Reese, ALSE Concierge, to a first-time user</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section" id="contact">
+      <h2>Interested in the architecture?</h2>
+      <p>
+        We are looking for platform partners and engineering teams who understand
+        that integrating AI into creative tools requires infrastructure, not features.
+      </p>
+      <form class="contact-form" id="contact-form" action="https://formspree.io/f/your-form-id" method="POST">
+        <input type="email" name="email" placeholder="Email address" required>
+        <input type="text" name="company" placeholder="Company (optional)">
+        <textarea name="message" placeholder="Tell us about your interest in ALSE..."></textarea>
+        <button type="submit">Send</button>
+      </form>
+      <p style="margin-top: 24px; font-size: 0.8rem; color: var(--text-muted);">
+        Or reach us directly at <a href="mailto:hello@benblends.ai" style="color: var(--accent); text-decoration: none;">hello@benblends.ai</a>
+      </p>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+      <div class="logo">ben<span>blends</span></div>
+      <div class="links">
+        <a href="https://github.com/benblends" target="_blank">GitHub</a>
+        <a href="#">LinkedIn</a>
+        <a href="mailto:hello@benblends.ai">Email</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const btn = this.querySelector('button');
+      const orig = btn.textContent;
+      btn.textContent = 'Sending...';
+      btn.disabled = true;
+
+      const data = new FormData(this);
+      fetch(this.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      }).then(r => {
+        if (r.ok) {
+          btn.textContent = 'Message sent ✓';
+          this.reset();
+        } else {
+          btn.textContent = 'Error — try email instead';
+        }
+      }).catch(() => {
+        btn.textContent = 'Error — try email instead';
+      }).finally(() => {
+        setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000);
+      });
+    });
+  </script>
+</body>
+</html>

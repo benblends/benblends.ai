@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AES Show 2026 — A Deterministic Multi-Agent Architecture for Voice-Controlled DAW Interaction</title>
+  <meta name="description" content="Express Paper presented at the 161st AES Convention, Nashville, Oct 30 – Nov 1, 2026. A session model, a bidirectional event bus, and three safety locks for voice-controlled DAW interaction.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0b;
+      --bg-card: #121214;
+      --bg-elevated: #18181b;
+      --border: #27272a;
+      --text: #f4f4f5;
+      --text-dim: #a1a1aa;
+      --text-muted: #71717a;
+      --accent: #22d3ee;
+      --accent-dim: #0891b2;
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 64px 64px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 64px;
+    }
+
+    .logo {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      text-decoration: none;
+    }
+
+    .logo span { color: var(--accent); }
+
+    .nav-links { display: flex; gap: 28px; align-items: center; }
+
+    .nav-links a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: clamp(1.75rem, 4vw, 2.5rem);
+      font-weight: 600;
+      line-height: 1.25;
+      letter-spacing: -0.02em;
+      margin-bottom: 20px;
+    }
+
+    .byline {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      padding-bottom: 36px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .byline strong { color: var(--text); font-weight: 500; }
+
+    .lede {
+      font-size: 1.125rem;
+      color: var(--text);
+      margin-bottom: 56px;
+    }
+
+    section { margin-bottom: 56px; }
+
+    h2 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    p { margin-bottom: 18px; color: var(--text-dim); }
+    p:last-child { margin-bottom: 0; }
+    p strong { color: var(--text); font-weight: 500; }
+
+    ul.constraints { list-style: none; }
+
+    ul.constraints li {
+      position: relative;
+      padding-left: 22px;
+      margin-bottom: 16px;
+      color: var(--text-dim);
+    }
+
+    ul.constraints li::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 11px;
+      width: 8px;
+      height: 1px;
+      background: var(--accent-dim);
+    }
+
+    ul.constraints li strong { color: var(--text); font-weight: 500; }
+
+    .card-grid { display: grid; gap: 16px; }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+    }
+
+    .card h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+
+    .card p { font-size: 0.9rem; margin-bottom: 0; }
+
+    .status {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--amber);
+      border: 1px solid rgba(251, 191, 36, 0.25);
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-bottom: 12px;
+    }
+
+    .status.ready {
+      color: var(--green);
+      border-color: rgba(74, 222, 128, 0.25);
+    }
+
+    .contact-block {
+      background: var(--bg-elevated);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+
+    .contact-block p { margin-bottom: 14px; }
+
+    .contact-block a.email {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      color: var(--accent);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(34, 211, 238, 0.3);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 32px 0 56px;
+      border-top: 1px solid var(--border);
+      margin-top: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    footer .logo { font-size: 1rem; }
+
+    footer .links { display: flex; gap: 24px; }
+
+    footer .links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+    }
+
+    footer .links a:hover { color: var(--text); }
+
+    @media (max-width: 640px) {
+      nav { margin-bottom: 44px; }
+      .nav-links { gap: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <nav>
+      <a href="/" class="logo">ben<span>blends</span></a>
+      <div class="nav-links">
+        <a href="/">Main site</a>
+        <a href="#artifacts">Artifacts</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </nav>
+
+    <header>
+      <div class="eyebrow">AES Show 2026 Nashville · 161st Convention · Express Paper, Category 2</div>
+      <h1>A Deterministic Multi-Agent Architecture for Voice-Controlled DAW Interaction</h1>
+      <div class="byline">
+        <strong>Benjamin Blagg</strong> · presented October 30 – November 1, 2026 · Gaylord Opryland Resort, Nashville
+      </div>
+    </header>
+
+    <p class="lede">
+      Voice control of a digital audio workstation has never failed because speech
+      recognition was not good enough. It has failed because a stateless command pipeline
+      cannot be trusted with a session. This paper presents an architecture built to answer
+      that failure — a session model, a bidirectional event bus, and three safety locks —
+      with measurements from an 18-month reference implementation.
+    </p>
+
+    <section id="argument">
+      <h2>The argument</h2>
+      <p>
+        A stateless system does not know the session. Ask it to arm a track and it has no way
+        to know whether that track exists, whether it is already armed, or whether arming it
+        right now would disturb a take in progress. Only a live model of the session answers
+        those questions; a command grammar cannot.
+      </p>
+      <p>
+        A stateless system cannot roll back safely. A compound command — create a bus, route
+        two tracks through it, insert an effect — can fail partway. Without a record of what
+        it already did, the system cannot undo the completed steps, and the user is left to
+        repair the session by hand in software they may not know how to operate.
+      </p>
+      <p>
+        A stateless system is blind to the DAW's own actions. If the musician stops the
+        transport with the mouse or deletes a track at the console, the voice layer keeps
+        operating on a stale picture. The picture drifts further from reality with every
+        change, and each command becomes a gamble.
+      </p>
+      <p>
+        Together these produce the thing that actually matters: a user who hits one failure
+        does not trust the system enough to try again. <strong>In a recording environment,
+        where a wrong move can destroy an unrepeatable take, trust is the entire
+        product.</strong>
+      </p>
+    </section>
+
+    <section id="constraints">
+      <h2>What the system does not do</h2>
+      <ul class="constraints">
+        <li><strong>It plays no notes.</strong> No melodies, no lyrics, no parts, no
+          suggestions rendered as audio. Every creative decision in a session belongs to the
+          musician.</li>
+        <li><strong>It trains on nothing.</strong> No user audio, no user performances, no
+          session data leaving the machine. There is no training set to license and nothing
+          in the output to label.</li>
+        <li><strong>It decides nothing about the music.</strong> The system operates the
+          recording environment — transport, tracks, routing, levels — and holds no opinion
+          about the song.</li>
+        <li><strong>It reports only verified state.</strong> The system does not speak about a
+          change until the DAW confirms the change happened. When it says a track is muted, it
+          is reporting the DAW's actual state, not the command it intended to send.</li>
+      </ul>
+    </section>
+
+    <section id="artifacts">
+      <h2>Artifacts</h2>
+      <div class="card-grid">
+        <!-- PLACEHOLDER: insert <a href="./alse-aes-2026-manuscript.pdf"> when camera-ready PDF lands -->
+        <div class="card">
+          <span class="status">Pending</span>
+          <h3>The paper</h3>
+          <p>
+            Full manuscript, 4–8 pages. Available on this page once the AES camera-ready
+            version is filed.
+          </p>
+        </div>
+
+        <!-- PLACEHOLDER: insert <video> or poster-frame image when the in-studio capture is edited -->
+        <div class="card">
+          <span class="status">October 2026</span>
+          <h3>The demonstration</h3>
+          <p>
+            An in-studio capture of a session run entirely by voice: commands issued from the
+            instrument, and a compound operation rolled back cleanly after a deliberate
+            failure.
+          </p>
+        </div>
+
+        <!-- PLACEHOLDER: insert the three figures (architecture overview, routing waterfall, latency distributions) -->
+        <div class="card">
+          <span class="status">Pending</span>
+          <h3>Figures</h3>
+          <p>
+            System architecture overview, the routing waterfall, and latency distributions
+            from the 1,000-command benchmark.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="claims">
+      <h2>What the paper claims, and what it does not</h2>
+      <p>
+        The measurements characterize the execution substrate: intent classification,
+        command acknowledgment through the execution bridge, event propagation, and rollback
+        success across three failure grades.
+      </p>
+      <p>
+        The paper does not claim task-level usability, and it reports no controlled user
+        study. The reference implementation is one system tested against one commercial DAW.
+        Generalizing the architecture to other hosts remains future work.
+      </p>
+    </section>
+
+    <section id="contact">
+      <h2>Contact</h2>
+      <div class="contact-block">
+        <p>
+          The reference implementation described in this paper is
+          <strong>ALSE</strong> — Advanced Live Studio Environment, built by BenBlends.
+        </p>
+        <p>
+          For research, review, or integration conversations about the architecture:
+        </p>
+        <p><a class="email" href="mailto:contact@benblends.ai">contact@benblends.ai</a></p>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0;">
+          This page carries the paper and its evidence. It is not a product page.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="logo">ben<span>blends</span></div>
+      <div class="links">
+        <a href="https://github.com/benblends" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/benjamin-blagg-b44519333">LinkedIn</a>
+        <a href="mailto:contact@benblends.ai">Email</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

@@ -522,6 +522,7 @@
         <a href="#architecture">Architecture</a>
         <a href="#locks">Infrastructure</a>
         <a href="#story">The Story</a>
+        <a href="/aes-handout/">AES Paper</a>
         <a href="https://github.com/benblends" target="_blank">GitHub</a>
         <a href="#contact" class="btn btn-primary">Get in Touch</a>
       </div>
@@ -539,7 +540,7 @@
       </h1>
       <p>
         A deterministic execution harness for AI-assisted recording. Not a chatbot
-        bolted onto a DAW. An 8-tier architecture that sits between the user, the
+        bolted onto a DAW. A layered architecture that sits between the user, the
         LLM, and the studio — solving hallucination, state sync, and the
         psychological safety net problem.
       </p>
@@ -552,20 +553,20 @@
     <!-- Stats -->
     <div class="stats">
       <div>
-        <div class="stat-value">18</div>
+        <div class="stat-value">21</div>
         <div class="stat-label">Months of development</div>
       </div>
       <div>
-        <div class="stat-value">1,250+</div>
-        <div class="stat-label">Passing tests</div>
+        <div class="stat-value">1,600+</div>
+        <div class="stat-label">Tests across 128 modules</div>
       </div>
       <div>
         <div class="stat-value">3</div>
         <div class="stat-label">Infrastructure locks</div>
       </div>
       <div>
-        <div class="stat-value">4</div>
-        <div class="stat-label">Persona architecture</div>
+        <div class="stat-value">3</div>
+        <div class="stat-label">Isolated personas</div>
       </div>
     </div>
 
@@ -574,13 +575,13 @@
       <div class="section-label">Architecture</div>
       <h2 class="section-title">Not a feature. A platform.</h2>
       <p class="section-sub">
-        ALSE is built on four systems that together solve the fundamental problem
+        ALSE is built on six systems that together solve the fundamental problem
         of integrating non-deterministic AI with deterministic DAW state management.
       </p>
 
       <div class="arch-grid">
         <div class="arch-card">
-          <div class="icon" style="background: rgba(34,211,238,0.1);">🎙️</div>
+          <div class="icon" style="background: rgba(34,211,238,0.1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#22d3ee" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="6" rx="7" ry="3"/><path d="M5 6v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6"/><path d="M5 12c0 1.7 3.1 3 7 3s7-1.3 7-3"/></svg></div>
           <h3>Session Context Model</h3>
           <p>
             A structured, SQLite-backed representation tracking song title, production
@@ -590,7 +591,7 @@
         </div>
 
         <div class="arch-card">
-          <div class="icon" style="background: rgba(74,222,128,0.1);">🛡️</div>
+          <div class="icon" style="background: rgba(74,222,128,0.1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v6c0 4.4-2.9 7.9-7 9-4.1-1.1-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></div>
           <h3>Execution Harness</h3>
           <p>
             Pre-flight snapshot capture, atomic execution, validation, and rollback
@@ -600,7 +601,7 @@
         </div>
 
         <div class="arch-card">
-          <div class="icon" style="background: rgba(251,191,36,0.1);">🔀</div>
+          <div class="icon" style="background: rgba(251,191,36,0.1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="12" r="2.5"/><path d="M8.4 7.2L15.5 11M8.4 16.8L15.5 13"/></svg></div>
           <h3>Three-Persona Routing</h3>
           <p>
             Reese (Concierge), James (Producer), Ray (Engineer). Each persona has
@@ -610,17 +611,17 @@
         </div>
 
         <div class="arch-card">
-          <div class="icon" style="background: rgba(139,92,246,0.1);">⚡</div>
+          <div class="icon" style="background: rgba(139,92,246,0.1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h7M4 12h12M4 18h7"/><path d="M16 3l3 3-3 3"/><path d="M19 15l-3 3 3 3"/></svg></div>
           <h3>Hybrid Intent Classifier</h3>
           <p>
-            Four-level waterfall: state override → fast-path regex (100ms) → brain
-            router → AI fallback. The 100ms mechanical layer handles critical
-            commands without LLM latency. Non-deterministic paths are sandboxed.
+            Four-level waterfall: state override → fast-path regex (sub-millisecond) → brain
+            router → AI fallback. The deterministic layer handles critical
+            commands without touching a language model. Non-deterministic paths are sandboxed.
           </p>
         </div>
 
         <div class="arch-card">
-          <div class="icon" style="background: rgba(248,113,113,0.1);">📡</div>
+          <div class="icon" style="background: rgba(248,113,113,0.1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 000 8.4M16.2 16.2a6 6 0 000-8.4"/><path d="M5 5a10 10 0 000 14M19 19a10 10 0 000-14"/></svg></div>
           <h3>Real-Time State Push</h3>
           <p>
             WebSocket EventBus replacing HTTP polling for sub-100ms UI sync.
@@ -630,7 +631,7 @@
         </div>
 
         <div class="arch-card">
-          <div class="icon" style="background: rgba(52,211,153,0.1);">🧠</div>
+          <div class="icon" style="background: rgba(52,211,153,0.1);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19h16"/><path d="M7 19v-5M12 19v-9M17 19v-13"/></svg></div>
           <h3>User Model</h3>
           <p>
             Cross-session learning that adapts behavior: same question gets a
@@ -688,6 +689,12 @@
           </p>
         </div>
       </div>
+
+      <p class="section-sub" style="margin-top: 32px; max-width: 760px;">
+        Two properties hold across all three: capture is gated behind a deliberate
+        footswitch tap, and the system reports only verified DAW state — it says a
+        track is muted because the DAW confirms it, not because a command was sent.
+      </p>
     </section>
 
     <!-- The Story -->
@@ -720,10 +727,8 @@
         </div>
 
         <div class="story-quote">
-          "I kept the take. It's sitting there labeled 'Blue Moon Take 1.'
-          It's not going anywhere. You might want it later — sometimes the messy
-          take has the feel, even if the notes aren't perfect."
-          <div class="attribution">— Reese, ALSE Concierge, to a first-time user</div>
+          "Done. Everything is back to where it was."
+          <div class="attribution">— the concierge, on completing a rollback. Verbatim from the system.</div>
         </div>
       </div>
     </section>

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BenBlends — ALSE: Advanced Live Studio Environment</title>
-  <meta name="description" content="BenBlends builds ALSE — a deterministic execution harness for AI-assisted music creation. Not a chatbot bolted onto a DAW. Architecture.">
+  <title>BenBlends — design and systems work</title>
+  <meta name="description" content="BenBlends is the design and systems practice of Benjamin Blagg — building tools that make AI trustworthy in real work. Flagship project: ALSE, an AES-published architecture for voice-controlled DAWs.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -99,6 +99,12 @@
 
     .nav-links a:hover {
       color: var(--text);
+    }
+    .nav-links a.btn-primary {
+      color: #0a0a0b;
+    }
+    .nav-links a.btn-primary:hover {
+      color: #0a0a0b;
     }
 
     .btn {
@@ -519,12 +525,12 @@
     <nav>
       <div class="logo">ben<span>blends</span></div>
       <div class="nav-links">
-        <a href="#architecture">Architecture</a>
-        <a href="#locks">Infrastructure</a>
-        <a href="#story">The Story</a>
-        <a href="/aes-handout/">AES Paper</a>
+        <a href="#architecture">Work</a>
+        <a href="#locks">The locks</a>
+        <a href="#story">The story</a>
+        <a href="/aes-handout/">AES paper</a>
         <a href="https://github.com/benblends" target="_blank">GitHub</a>
-        <a href="#contact" class="btn btn-primary">Get in Touch</a>
+        <a href="#contact" class="btn btn-primary">Get in touch</a>
       </div>
     </nav>
 
@@ -532,52 +538,53 @@
     <section class="hero">
       <div class="hero-badge">
         <span class="dot"></span>
-        ALSE 5.0 — Deterministic AI for DAWs
+        BenBlends — design &amp; systems work
       </div>
       <h1>
-        The AI infrastructure layer<br>
-        for <span class="highlight">music creation tools</span>
+        Systems that make AI<br>
+        <span class="highlight">trustworthy in real work</span>
       </h1>
       <p>
-        A deterministic execution harness for AI-assisted recording. Not a chatbot
-        bolted onto a DAW. A layered architecture that sits between the user, the
-        LLM, and the studio — solving hallucination, state sync, and the
-        psychological safety net problem.
+        BenBlends is the design and systems practice of Benjamin Blagg. The flagship
+        project is ALSE — a deterministic execution harness for AI-assisted recording,
+        documented in an Express Paper at AES Nashville 2026. The through-line holds in
+        every domain: an assistant should be able to prove what it did.
       </p>
       <div class="hero-actions">
-        <a href="#architecture" class="btn btn-outline">The Architecture</a>
-        <a href="#contact" class="btn btn-primary">Contact Us</a>
+        <a href="/aes-handout/" class="btn btn-primary">Read the paper</a>
+        <a href="#architecture" class="btn btn-outline">Selected work</a>
       </div>
     </section>
 
-    <!-- Stats -->
-    <div class="stats">
-      <div>
-        <div class="stat-value">21</div>
-        <div class="stat-label">Months of development</div>
-      </div>
-      <div>
-        <div class="stat-value">1,900+</div>
-        <div class="stat-label">Tests across 128 modules</div>
-      </div>
-      <div>
-        <div class="stat-value">3</div>
-        <div class="stat-label">Infrastructure locks</div>
-      </div>
-      <div>
-        <div class="stat-value">3</div>
-        <div class="stat-label">Isolated personas</div>
-      </div>
-    </div>
-
-    <!-- Architecture -->
+    <!-- Selected work -->
     <section class="arch-section" id="architecture">
-      <div class="section-label">Architecture</div>
-      <h2 class="section-title">Not a feature. A platform.</h2>
+      <div class="section-label">Selected work</div>
+      <h2 class="section-title">ALSE — a deterministic execution harness</h2>
       <p class="section-sub">
-        ALSE is built on six systems that together solve the fundamental problem
-        of integrating non-deterministic AI with deterministic DAW state management.
+        Built between 2024 and 2026 for AI-assisted recording: a session model, a
+        bidirectional event bus, and three safety locks, tested against a commercial
+        DAW. The architecture is documented in the AES paper.
       </p>
+
+      <!-- Stats -->
+      <div class="stats">
+        <div>
+          <div class="stat-value">21</div>
+          <div class="stat-label">Months of development</div>
+        </div>
+        <div>
+          <div class="stat-value">1,900+</div>
+          <div class="stat-label">Tests across 128 modules</div>
+        </div>
+        <div>
+          <div class="stat-value">3</div>
+          <div class="stat-label">Infrastructure locks</div>
+        </div>
+        <div>
+          <div class="stat-value">3</div>
+          <div class="stat-label">Isolated personas</div>
+        </div>
+      </div>
 
       <div class="arch-grid">
         <div class="arch-card">
@@ -735,15 +742,15 @@
 
     <!-- CTA -->
     <section class="cta-section" id="contact">
-      <h2>Interested in the architecture?</h2>
+      <h2>Working on the same problem?</h2>
       <p>
-        We are looking for platform partners and engineering teams who understand
-        that integrating AI into creative tools requires infrastructure, not features.
+        I am always glad to compare notes with teams building AI into creative tools —
+        and with anyone working on the trust problem in a different domain.
       </p>
       <form class="contact-form" id="contact-form" action="https://formspree.io/f/xojodlkj" method="POST">
         <input type="email" name="email" placeholder="Email address" required>
         <input type="text" name="company" placeholder="Company (optional)">
-        <textarea name="message" placeholder="Tell us about your interest in ALSE..."></textarea>
+        <textarea name="message" placeholder="Tell me what you're working on..."></textarea>
         <button type="submit">Send</button>
       </form>
       <p style="margin-top: 24px; font-size: 0.8rem; color: var(--text-muted);">
@@ -756,7 +763,7 @@
       <div class="logo">ben<span>blends</span></div>
       <div class="links">
         <a href="https://github.com/benblends" target="_blank">GitHub</a>
-        <a href="https://www.linkedin.com/in/benjamin-blagg-b44519333">LinkedIn</a>
+        <a href="https://www.linkedin.com/in/benblendsdesign">LinkedIn</a>
         <a href="mailto:contact@benblends.ai">Email</a>
       </div>
     </footer>
